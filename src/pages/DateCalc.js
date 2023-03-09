@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 function DateCalculator() {
-  const [dateType, setDateType] = useState('years');
-  const [value, setValue] = useState(null);
+  const [dateType, setDateType] = useState('Años');
+  const [value, setValue] = useState('');
   const [futureDate, setFutureDate] = useState(null);
   
   function handleChangeDateType(event) {
@@ -17,44 +17,51 @@ function DateCalculator() {
     event.preventDefault();
     const today = new Date();
     let future = new Date(today);
-    
-    if (dateType === 'years') {
+  
+    if (dateType === 'Años') {
       future.setFullYear(today.getFullYear() + value);
-    } else if (dateType === 'months') {
+    } else if (dateType === 'Meses') {
       future.setMonth(today.getMonth() + value);
-    } else if (dateType === 'days') {
+    } else if (dateType === 'Dias') {
       future.setDate(today.getDate() + value);
     } else {
-      setFutureDate('Invalid date type.');
+      setFutureDate('Tipo de dato invalido');
       return;
     }
-    
-    setFutureDate(future);
+  
+    if (isNaN(future.getTime())) {
+      setFutureDate('Fecha inválida');
+      return;
+    }
+  
+    const options = {day: '2-digit', month: '2-digit', year: 'numeric'};
+    setFutureDate(future.toLocaleDateString('es-ES', options));
   }
+  
   
   return (
     <div style={{position: 'fixed',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',}}>
-      <h2>Date Calculator</h2>
+      <h2>Calculador de Fechas</h2>
       <form onSubmit={handleSubmit} style={{ margin: "auto" }}>
-        <label htmlFor="date-type">Date Type:</label>
+        <label htmlFor="date-type">Tipo de dato:</label>
         <div>
         <select id="date-type" value={dateType} onChange={handleChangeDateType}>
-          <option value="years">Years</option>
-          <option value="months">Months</option>
-          <option value="days">Days</option>
+          <option value="Años">Años</option>
+          <option value="Meses">Meses</option>
+          <option value="Dias">Dias</option>
         </select>
         </div>
         <br />
-        <label htmlFor="value">Value:</label>
+        <label htmlFor="value">Valor:</label>
         <input type="number" id="value" value={value} onChange={handleChangeValue} />
         <br />
-        <button type="submit">Calculate Future Date</button>
+        <button type="submit">Calcular fecha futura</button>
       </form>
       <br />
-      {futureDate && <p>The future date is: {futureDate.toLocaleDateString()}</p>}
+      {futureDate && <p>La fecha futura es: {futureDate}</p>}
     </div>
   );
 }
