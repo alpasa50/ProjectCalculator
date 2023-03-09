@@ -43,7 +43,10 @@ function PaymentCalc() {
     setBuildingAmount(buildingAmount);
     setFinancialAmount(financialAmount);
     setPaymentFee(paymentFee);
-
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: 'smooth',
+    });
   }
 
   return (
@@ -52,6 +55,7 @@ function PaymentCalc() {
     left: '50%',
     transform: 'translate(-50%, -50%)',}}>
       <h2>Building Payment Calculator</h2>
+      <div style={{maxHeight: '370px', overflowY: 'scroll'}}>
       <form onSubmit={handleSubmit}>
         <label htmlFor="total-cost">Total Cost:</label>
         <input type="number" id="total-cost" value={totalCost} onChange={handleChangeTotalCost} />
@@ -71,22 +75,12 @@ function PaymentCalc() {
         <button type="submit">Calculate Payment Schedule</button>
       </form>
       <br />
-      {signingAmount > 0 && <p>Signing payment amount: ${signingAmount.toLocaleString(undefined, {
-            style: 'currency',
-            currency: 'USD',
-          })}</p>}
-      {buildingAmount > 0 && <p>Building payment amount: ${buildingAmount.toLocaleString(undefined, {
-            style: 'currency',
-            currency: 'USD',
-          })}</p>}
-      {financialAmount > 0 && <p>Financial payment amount: ${financialAmount.toLocaleString(undefined, {
-            style: 'currency',
-            currency: 'USD',
-          })}</p>}
-       {paymentFee > 0 && <p>Payment fee per month: ${paymentFee.toLocaleString(undefined, {
-            style: 'currency',
-            currency: 'USD',
-          })}</p>}
+      {signingAmount > 0 && <p>Signing payment amount: ${signingAmount.toLocaleString()}</p>}
+      {buildingAmount > 0 && <p>Building payment amount: ${buildingAmount.toLocaleString()}</p>}
+      {financialAmount > 0 && <p>Financial payment amount: ${financialAmount.toLocaleString()}</p>}
+       {paymentFee > 0 && <p>Payment fee per month: ${paymentFee.toLocaleString()}</p>}
+      </div>
+
     </div>
   );
 }
