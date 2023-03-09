@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 function PaymentCalc() {
-  const [totalCost, setTotalCost] = useState(0);
-  const [signingPercentage, setSigningPercentage] = useState(0);
-  const [buildingPercentage, setBuildingPercentage] = useState(0);
-  const [financialPercentage, setFinancialPercentage] = useState(0);
-  const [signingAmount, setSigningAmount] = useState(0);
+  const [totalCost, setTotalCost] = useState(null);
+  const [signingPercentage, setSigningPercentage] = useState(null);
+  const [buildingPercentage, setBuildingPercentage] = useState(null);
+  const [financialPercentage, setFinancialPercentage] = useState(null);
+  const [signingAmount, setSigningAmount] = useState(null);
   const [buildingAmount, setBuildingAmount] = useState(0);
   const [financialAmount, setFinancialAmount] = useState(0);
-  const [monthsToPay, setMonthsToPay] = useState(0);
+  const [monthsToPay, setMonthsToPay] = useState(null);
   const [paymentFee, setPaymentFee] = useState(0);
 
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function DateCalculator() {
   const [dateType, setDateType] = useState('years');
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(null);
   const [futureDate, setFutureDate] = useState(null);
   
   function handleChangeDateType(event) {
