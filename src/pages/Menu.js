@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function Menu() {
   return (
-    <Navbar expand="md" className="fixed-top">
+    <Navbar expand="md" className="fixed-top" style={{ zIndex: '100' }}>
       <Navbar.Toggle aria-controls="basic-navbar-nav" >
       </Navbar.Toggle>
       <Navbar.Collapse id="basic-navbar-nav">

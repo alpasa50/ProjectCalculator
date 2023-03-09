@@ -7,7 +7,7 @@ import Menu from './pages/Menu'
 function App() {
   return (
     <BrowserRouter>
-      <Menu />
+    <Menu />
     <Routes>
         <Route exact path="/" element={<PaymentCalc />} />
         <Route path="/DateCalc" element={<DateCalc />} />

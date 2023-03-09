@@ -33,7 +33,10 @@ function DateCalculator() {
   }
   
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',}}>
       <h2>Date Calculator</h2>
       <form onSubmit={handleSubmit} style={{ margin: "auto" }}>
         <label htmlFor="date-type">Date Type:</label>

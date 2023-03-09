@@ -47,7 +47,10 @@ function PaymentCalc() {
   }
 
   return (
-    <div style={{textAlign: 'center'}}>
+    <div style={{position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',}}>
       <h2>Building Payment Calculator</h2>
       <form onSubmit={handleSubmit}>
         <label htmlFor="total-cost">Total Cost:</label>
