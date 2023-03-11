@@ -59,14 +59,16 @@ function PaymentCalc() {
   }
 
   return (
-    <div style={{position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',}}>
-      <h2>Calculadora de pagos</h2>
-      <div style={{maxHeight: '370px', overflowY: 'scroll'}}>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="total-cost">Nombre del proyecto:</label>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      padding: '60px',
+    }}>
+      <h2 style={{fontSize: '2rem'}}>Calculadora de pagos</h2>
+      <div>
+      <form onSubmit={handleSubmit} style={{width: '100%'}}>
+        <label htmlFor="project-name">Nombre del proyecto:</label>
         <input type="text" id="project-name" value={projectName} onChange={handleChangeProjectName} />
         <br />
         <label htmlFor="total-cost">Precio:</label>

@@ -9,7 +9,7 @@ function Menu() {
       </Navbar.Toggle>
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="flex-column">
-          <Nav.Link as={Link} to="/" style={{color: 'black', fontWeight: 'bold', background: '#dcdcdc'}}>Payment Calc</Nav.Link>
+          <Nav.Link as={Link} to="/" style={{color: 'black', fontWeight: 'bold', background: '#dcdcdc'}}>Calculadora de pagos</Nav.Link>
           <Nav.Link as={Link} to="/DateCalc" style={{color: 'black', fontWeight: 'bold', background: '#dcdcdc'}}>Calculadora de fechas</Nav.Link>
         </Nav>
       </Navbar.Collapse>
