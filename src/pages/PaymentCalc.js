@@ -68,7 +68,7 @@ function PaymentCalc() {
 
   const getPaymentDates = () => {
     const startDate = new Date();
-    const startMonth = startDate.getMonth();
+    const startMonth = startDate.getMonth() + 1; // Adding 1 to get the next month;
     const paymentDates = [];
     let paymentYear = startDate.getFullYear();
     let paymentMonth = startMonth + 1;
