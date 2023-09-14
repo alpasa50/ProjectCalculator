@@ -33,6 +33,10 @@ function DateCalculator() {
       setFutureDate('Fecha inválida');
       return;
     }
+
+    // Set the date to the first day of the next month
+    future.setDate(1);
+    future.setMonth(future.getMonth() + 1);
   
     const options = {day: '2-digit', month: '2-digit', year: 'numeric'};
     setFutureDate(future.toLocaleDateString('es-ES', options));
