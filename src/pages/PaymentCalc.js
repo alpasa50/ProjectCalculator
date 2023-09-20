@@ -3,6 +3,7 @@ import '../utils/PaymentCalc.css';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import logo from '../assets/plusval-logo-black.png';
+import { PDFDocument } from 'pdf-lib'
 
 function PaymentCalc() {
 
@@ -25,7 +26,7 @@ function PaymentCalc() {
   const tableRef = useRef(null);
 
 
-  function generatePDF() {
+  async function generatePDF() {
     // Get the table element
     const table = document.querySelector('table');
   
@@ -54,16 +55,40 @@ function PaymentCalc() {
     const pdf = new jsPDF('p', 'pt', [paperWidth, paperHeight]);
   
     // Use html2canvas to capture the table as an image
-    html2canvas(table).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
+    const canvas = await html2canvas(table);
+    const imgData = canvas.toDataURL('image/png');
   
-      // Add the image to the PDF document
-      pdf.addImage(imgData, 'PNG', 0, 0, paperWidth, paperHeight);
+    // Add the image to the PDF document
+    pdf.addImage(imgData, 'PNG', 0, 0, paperWidth, paperHeight);
   
-      // Download the PDF document
-      pdf.save('plan_de_pagos.pdf');
-    });
+    // Compress and download the PDF document
+    compressAndDownloadPDF(pdf);
   }
+  
+  async function compressAndDownloadPDF(pdf) {
+    // Load the PDF document using pdf-lib
+    const pdfBytes = await pdf.output('arraybuffer');
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+  
+    // You can now perform compression or other operations on the PDF here
+  
+    // Create a new PDF with the compressed content
+    const compressedPdfBytes = await pdfDoc.save();
+  
+    // Create a blob from the compressed PDF
+    const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+  
+    // Create a download link and trigger the download
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plan_de_pagos_${projectName}.pdf`;
+    a.click();
+  
+    // Revoke the object URL to free up memory
+    window.URL.revokeObjectURL(url);
+  }
+  
   
 
   const getPaymentDates = () => {
