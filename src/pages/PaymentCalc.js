@@ -4,12 +4,13 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import logo from '../assets/plusval-logo-black.png';
 import { PDFDocument } from 'pdf-lib'
+import Swal from 'sweetalert2';
 
 function PaymentCalc() {
 
   const [greenColor, setGreenColor] = useState('#75BD42');
   const [showImage, setShowImage] = useState(true);
-
+  const [manejarPorPorcentajes, setManejarPorPorcentajes] = useState(true);
 
   const [projectName, setProjectName] = useState('');
   const [reserve, setReserve] = useState('');
@@ -25,6 +26,17 @@ function PaymentCalc() {
 
   const tableRef = useRef(null);
 
+  const handleChangeManejo = () => {
+    setManejarPorPorcentajes(!manejarPorPorcentajes);
+
+    // Mostrar la alerta al usuario
+    Swal.fire({
+      title: 'Cambio de modo',
+      text: `Ahora estás calculando en base a ${manejarPorPorcentajes ? 'montos' : 'porcentajes'}.`,
+      icon: 'info',
+      confirmButtonText: 'Entendido'
+    });
+  };
 
   async function generatePDF() {
     // Get the table element
@@ -148,14 +160,39 @@ function PaymentCalc() {
 
   function handleSubmit(event) {
     event.preventDefault();
-    const signingAmount = (totalCost * signingPercentage) / 100 - reserve;
-    const buildingAmount = (totalCost * buildingPercentage) / 100;
-    const financialAmount = (totalCost * financialPercentage) / 100;
-    const paymentFee = buildingAmount / monthsToPay;
+  
+    let signingAmount, buildingAmount, financialAmount, paymentFee;
+  
+    if (manejarPorPorcentajes) {
+      signingAmount = (totalCost * signingPercentage) / 100 - reserve;
+      buildingAmount = (totalCost * buildingPercentage) / 100;
+      financialAmount = (totalCost * financialPercentage) / 100;
+    } else {
+      signingAmount = signingPercentage;
+      buildingAmount = buildingPercentage;
+      financialAmount = financialPercentage;
+    }
+  
+    paymentFee = buildingAmount / monthsToPay;
+
+    const totalAmount = signingAmount + buildingAmount + financialAmount + parseInt(reserve, 10);
+    console.log(totalAmount)
+  if (totalAmount !== totalCost) {
+    // Mostrar una alerta si la suma no coincide
+    Swal.fire({
+      title: 'Error en los cálculos',
+      text: 'La suma de los montos no coincide con el precio total.',
+      icon: 'error',
+      confirmButtonText: 'Entendido'
+    });
+    return; // Salir de la función handleSubmit
+  }
+  
     setSigningAmount(signingAmount);
     setBuildingAmount(buildingAmount);
     setFinancialAmount(financialAmount);
     setPaymentFee(paymentFee);
+  
     window.scrollTo({
       top: document.body.scrollHeight,
       behavior: 'smooth',
@@ -171,6 +208,16 @@ function PaymentCalc() {
     }}>
       <h2 style={{ fontSize: '2rem' }}>Calculadora de pagos</h2>
       <div>
+      <label>
+        <input
+          type="checkbox"
+          checked={manejarPorPorcentajes}
+          onChange={handleChangeManejo}
+        />
+        {manejarPorPorcentajes ? 'Calcular en base a porcentajes' : 'Calcular en base a montos'}
+      </label>
+    </div>
+      <div>
         <form onSubmit={handleSubmit} style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <label htmlFor="project-name">Nombre del proyecto:</label>
           <input type="text" id="project-name" value={projectName} onChange={handleChangeProjectName} />
@@ -178,11 +225,11 @@ function PaymentCalc() {
           <input type="number" id="total-cost" value={totalCost} onChange={handleChangeTotalCost} />
           <label htmlFor="total-cost">Reserva:</label>
           <input type="text" id="reserve" value={reserve} onChange={handleChangeReserve} />
-          <label htmlFor="signing-percentage">Completar separacion (%):</label>
+          <label htmlFor="signing-percentage">Completar separacion ({manejarPorPorcentajes ? '%' : "Montos"}):</label>
           <input type="number" id="signing-percentage" value={signingPercentage} onChange={handleChangeSigningPercentage} />
-          <label htmlFor="building-percentage">Durante la construcción (%):</label>
+          <label htmlFor="building-percentage">Durante la construcción ({manejarPorPorcentajes ? '%' : "Montos"}):</label>
           <input type="number" id="building-percentage" value={buildingPercentage} onChange={handleChangeBuildingPercentage} />
-          <label htmlFor="financial-percentage">Pago contra entrega (%):</label>
+          <label htmlFor="financial-percentage">Pago contra entrega ({manejarPorPorcentajes ? '%' : "Montos"}):</label>
           <input type="number" id="financial-percentage" value={financialPercentage} onChange={handleChangeFinancialPercentage} />
           <label htmlFor="months-to-pay">Meses para pagar:</label>
           <input type="number" id="months-to-pay" value={monthsToPay} onChange={handleChangeMonthsToPay} />
@@ -226,15 +273,15 @@ function PaymentCalc() {
                 <td>${reserve.toLocaleString()}</td>
               </tr>
               <tr>
-                <td>Completar separacion ({signingPercentage}%):</td>
+                <td>Completar separacion ({manejarPorPorcentajes ? signingPercentage + "%" : signingPercentage}):</td>
                 <td>${signingAmount.toLocaleString()}</td>
               </tr>
               <tr>
-                <td>Durante la construcción ({buildingPercentage}%):</td>
+                <td>Durante la construcción ({manejarPorPorcentajes ? buildingPercentage + "%" : buildingPercentage}):</td>
                 <td>${buildingAmount.toLocaleString()}</td>
               </tr>
               <tr>
-                <td>Pago contra entrega ({financialPercentage}%):</td>
+                <td>Pago contra entrega ({manejarPorPorcentajes ? financialPercentage + "%" : financialPercentage}):</td>
                 <td>${financialAmount.toLocaleString()}</td>
               </tr>
               {monthsToPay > 0 && (
