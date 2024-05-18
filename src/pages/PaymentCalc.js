@@ -36,7 +36,7 @@ function PaymentCalc() {
   const [selectedAmount, setSelectedAmount] = useState(0);
   const [selectedDates, setSelectedDates] = useState([]);
   const extraPaymentsAmount = useRef(selectedAmount);
-  const [currency, setCurrency] = useState('RD$');
+  const [currency, setCurrency] = useState('US$');
 
 
   const tableRef = useRef(null);
