@@ -8,8 +8,8 @@ import Swal from 'sweetalert2';
 
 function PaymentCalc() {
 
-  const [greenColor, setGreenColor] = useState('#75BD42');
-  const [showImage, setShowImage] = useState(true);
+  const [greenColor] = useState('#75BD42');
+  const [showImage] = useState(false);
   const [manejarPorPorcentajes, setManejarPorPorcentajes] = useState(true);
   const [pagosExtraordinarios, setPagosExtraordinarios] = useState(false);
   // const [isInputEnabled, setIsInputEnabled] = useState(false);
@@ -279,10 +279,10 @@ function PaymentCalc() {
   
   const paymentDates = getPaymentDates();
 
-  const handleToggleColors = () => {
-    setGreenColor(color => color === '#75BD42' ? 'white' : '#75BD42');
-    setShowImage(showImage => !showImage);
-  };
+  // const handleToggleColors = () => {
+  //   setGreenColor(color => color === '#75BD42' ? 'white' : '#75BD42');
+  //   setShowImage(showImage => !showImage);
+  // };
 
   function handleChangeTotalCost(event) {
 
@@ -335,10 +335,9 @@ function PaymentCalc() {
     if (manejarPorPorcentajes) {
       signingAmount = (totalCost * signingPercentage) / 100 - reserve;
       buildingAmount = (totalCost * buildingPercentage) / 100;
-      const financialAmountTemp = (100 - (signingPercentage + buildingPercentage)) / 100;
-      financialAmount = totalCost * financialAmountTemp;
-      return { signingAmount, buildingAmount, financialAmount, financialPercentage: financialAmountTemp };
-
+      const financialPercentage = (100 - (signingPercentage + buildingPercentage)); // AQUÍ 🔥
+      financialAmount = (totalCost * financialPercentage) / 100;
+      return { signingAmount, buildingAmount, financialAmount, financialPercentage };
     } else {
       buildinAmountPersist.current = buildingAmount;
       signingAmount = signingPercentage;
@@ -347,6 +346,7 @@ function PaymentCalc() {
       return { signingAmount, buildingAmount, financialAmount, financialPercentage: financialAmount };
     }
   }
+  
 
   function handleChangeProjectName(event) {
     setProjectName(event.target.value);
@@ -362,124 +362,124 @@ function PaymentCalc() {
 
   function handleSubmit(event) {
     event.preventDefault();
-  
+
     let signingAmount, buildingAmount, financialAmount, paymentFee;
 
-  
     if (manejarPorPorcentajes) {
-      signingAmount = (totalCost * signingPercentage) / 100 - reserve;
-      buildingAmount = (totalCost * buildingPercentage) / 100;
-      const financialAmountTemp = (100 - (signingPercentage + buildingPercentage)) / 100;
-      financialAmount = totalCost * financialAmountTemp;
-      setFinancialPercentage(financialAmountTemp);
-      buildinAmountPersist.current = buildingAmount;
-      
-      if(pagosExtraordinarios){
+        signingAmount = (totalCost * signingPercentage) / 100 - reserve;
+        buildingAmount = (totalCost * buildingPercentage) / 100;
+        const financialPercentageTemp = 100 - (signingPercentage + buildingPercentage);  // Mantén el porcentaje como un número
+        financialAmount = totalCost * (financialPercentageTemp / 100);
+        setFinancialPercentage(financialPercentageTemp);  // Establece el porcentaje correcto (no el monto)
         buildinAmountPersist.current = buildingAmount;
-        buildingAmount = buildingAmount - extraPaymentsAmount.current;
-      }
+
+        if (pagosExtraordinarios) {
+            buildinAmountPersist.current = buildingAmount;
+            buildingAmount = buildingAmount - extraPaymentsAmount.current;
+        }
     } else {
-
-
-      buildinAmountPersist.current = buildingAmount;
-      signingAmount = signingPercentage;
-      buildingAmount = buildingPercentage;
-      financialAmount = totalCost - (signingAmount + buildingAmount + parseInt(reserve));
-      setFinancialPercentage(financialAmount);
-
-      if(pagosExtraordinarios){
         buildinAmountPersist.current = buildingAmount;
-        buildingAmount = buildingAmount - extraPaymentsAmount.current;
-      }
+        signingAmount = signingPercentage;
+        buildingAmount = buildingPercentage;
+        financialAmount = totalCost - (signingAmount + buildingAmount + parseInt(reserve));
+        setFinancialPercentage(financialAmount);  // Esto debe ser porcentaje, no monto
+
+        if (pagosExtraordinarios) {
+            buildinAmountPersist.current = buildingAmount;
+            buildingAmount = buildingAmount - extraPaymentsAmount.current;
+        }
     }
 
-    let totalAmount = 0    
+    let totalAmount = 0;
     totalAmount = signingAmount + buildingAmount + extraPaymentsAmount.current + financialAmount + parseInt(reserve, 10);
     paymentFee = buildingAmount / monthsToPay;
-  
+
     if (totalAmount !== totalCost) {
-      // Mostrar una alerta si la suma no coincide
-      Swal.fire({
-        title: 'Error en los cálculos',
-        text: 'La suma de los montos no coincide con el precio total.',
-        icon: 'error',
-        confirmButtonText: 'Entendido'
-      });
-      return; // Salir de la función handleSubmit
+        // Mostrar una alerta si la suma no coincide
+        Swal.fire({
+            title: 'Error en los cálculos',
+            text: 'La suma de los montos no coincide con el precio total.',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+        });
+        return; // Salir de la función handleSubmit
     }
-  
+
     setSigningAmount(signingAmount);
     setBuildingAmount(buildingAmount);
     setFinancialAmount(financialAmount);
     setPaymentFee(paymentFee);
-  
+
     window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: 'smooth',
+        top: document.body.scrollHeight,
+        behavior: 'smooth',
     });
-  }
+}
 
   return (
     <div className='container' style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      padding: '30px',
-    }}><div style={{
+      padding: '40px',
+      backgroundColor: '#f9fafb',
+      borderRadius: '20px',
+      boxShadow: '0px 8px 24px rgba(0,0,0,0.1)',
+      maxWidth: '800px',
+      margin: 'auto',
+    }}> <div style={{
       display: 'flex',
-      alignItems: 'center', // Alinea verticalmente los elementos
+      alignItems: 'center',
+      marginBottom: '20px',
     }}>
-      <h2 style={{ fontSize: '2rem' }}>Calculadora de pagos</h2>
-      <button
-      style={{marginLeft:"30px"}}
+       <h2 className='titulo-pagos'>Calculadora de pagos</h2>
+    {/* <button
+      style={{
+        marginLeft: '20px',
+        padding: '10px 20px',
+        borderRadius: '10px',
+        backgroundColor: '#3b82f6',
+        color: '#fff',
+        border: 'none',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        fontSize: '1rem',
+      }}
       onClick={handleToggleColors}
     >
       Plusvalizar
-    </button>  
-      </div>
-      <div>
-      Calcular: { ' ' }
-      <label>
-        <input
-          type="checkbox"
-          checked={manejarPorPorcentajes}
-          onChange={() => handleChangeManejo(true)}
-        />
-        Porcentajes
-      </label>
-      { ' ' }
-      <label>
-        <input
-          type="checkbox"
-          checked={!manejarPorPorcentajes}
-          onChange={() => handleChangeManejo(false)}
-        />
-        Montos
-      </label>
-    </div>
-    <div>
-      <label>
-      Pagos extraordinarios: { ' ' }
-      <input
-        type="checkbox"
-        checked={pagosExtraordinarios}
-        onChange={handlePagosExtra}
-      />
-      Añadir
-    </label>
-    { ' ' }
-    <label>
-      <input
-        type="checkbox"
-        checked={!pagosExtraordinarios}
-        onChange={() => handlePagosExtra(!pagosExtraordinarios)}
-      />
-      No añadir
-    </label>
+    </button> */}
+  </div>
 
+
+      <div style={{ marginBottom: '20px' }}>
+    <strong>Calcular: </strong>
+    <label style={{ margin: '0 10px' }}>
+      <input type="checkbox" checked={manejarPorPorcentajes} onChange={() => handleChangeManejo(true)} /> Porcentajes
+    </label>
+    <label>
+      <input type="checkbox" checked={!manejarPorPorcentajes} onChange={() => handleChangeManejo(false)} /> Montos
+    </label>
     </div>
+
+    <div style={{ marginBottom: '20px' }}>
+    <strong>Pagos extraordinarios: </strong>
+    <label style={{ margin: '0 10px' }}>
+      <input type="checkbox" checked={pagosExtraordinarios} onChange={handlePagosExtra} /> Añadir
+    </label>
+    <label>
+      <input type="checkbox" checked={!pagosExtraordinarios} onChange={() => handlePagosExtra(!pagosExtraordinarios)} /> No añadir
+    </label>
+  </div>
+
       <div>
-        <form onSubmit={handleSubmit} style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+        <form onSubmit={handleSubmit} style={{
+    width: '100%',
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '20px',
+    marginBottom: '30px',
+  }}>
           <label htmlFor="project-name">Nombre del proyecto:</label>
           <input type="text" id="project-name" value={projectName} onChange={handleChangeProjectName} />
           <label htmlFor="currency-select">Seleccionar moneda:</label>
@@ -497,7 +497,7 @@ function PaymentCalc() {
           <input type="number" id="building-percentage" value={buildingPercentage} onChange={handleChangeBuildingPercentage} />
           <label htmlFor="financial-percentage">Pago contra entrega ({manejarPorPorcentajes ? '%' : "Montos"}):</label>
           {manejarPorPorcentajes ? (
-            <span>{financialPercentage * 100}%</span>
+            <span>{financialPercentage}%</span>
           ) : (
             <span>${financialAmount.toLocaleString()}</span>
           )}
@@ -557,14 +557,33 @@ function PaymentCalc() {
     </>
   </>
 )}
-          <div style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
-            <button type="submit">Calcular plan de pago</button>
-          </div>
-        </form>
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '20px' }}>
+      <button type="submit" style={{
+        padding: '12px 24px',
+        backgroundColor: '#10b981',
+        color: 'white',
+        fontWeight: 'bold',
+        borderRadius: '10px',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+      }}>
+        Calcular plan de pago
+      </button>
+    </div>
+  </form>
         <br/>
         {totalCost > 0 && (
           
-          <div ref={tableRef}>
+          <div ref={tableRef} style={{
+            backgroundColor: '#ffffff',
+            padding: '30px',
+            borderRadius: '15px',
+            boxShadow: '0px 6px 18px rgba(0,0,0,0.1)',
+            width: '100%',
+            overflowX: 'auto',
+          }}>
           <table style={{margin: '0 auto'}}>      
             <tbody>
               {showImage && (
@@ -585,6 +604,8 @@ function PaymentCalc() {
                 <td>Reserva:</td>
                 <td>{currency}{reserve.toLocaleString()}</td>
               </tr>
+              <td colSpan="2" style={{fontSize:'12px'}}><strong>*La Reserva no es Reembolsable</strong></td>
+              
               <tr>
                 <td>Completar separacion ({manejarPorPorcentajes ? signingPercentage + "%" : signingPercentage}):</td>
                 <td>{currency}{signingAmount.toLocaleString()}</td>
@@ -594,10 +615,11 @@ function PaymentCalc() {
                 <td>{currency}{(buildinAmountPersist.current || 0) === 0 ? buildingAmount : (buildinAmountPersist.current || 0).toLocaleString()}</td>
               </tr>
               <tr>
-                <td>Pago contra entrega ({manejarPorPorcentajes ? financialPercentage * 100 + "%" : financialPercentage}):</td>
+                <td>Pago contra entrega ({manejarPorPorcentajes ? financialPercentage + "%" : financialPercentage}):</td>
                 <td>{currency}{financialAmount.toLocaleString()}</td>
-                
               </tr>
+              
+              
               <tr>
                 <td colSpan={2}>
                 {selectedDates.length > 0 && (
@@ -688,7 +710,17 @@ function PaymentCalc() {
         )}
 
       </div>
-      <button onClick={generatePDF}>Generar PDF</button>   
+      <button  onClick={generatePDF} style={{
+        padding: '12px 24px',
+        backgroundColor: 'gray',
+        color: 'white',
+        fontWeight: 'bold',
+        borderRadius: '10px',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '1rem',
+        boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+      }}>Generar PDF</button>
     </div>
   );
 }

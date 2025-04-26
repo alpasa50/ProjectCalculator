@@ -12,3 +12,118 @@ table {
   th {
     background-color: #f2f2f2;
   }
+
+
+  .input {
+    @apply p-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none;
+  }
+
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid black;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 8px 0;
+  }
+  
+  input:focus, select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+    outline: none;
+  }
+
+  
+  form {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px; /* Puedes ajustar este valor para controlar el espaciado entre las columnas */
+    margin-top: 10px; /* Controla el margen superior si es necesario */
+  }
+  
+  form label {
+    margin: 0; /* Elimina el margen de las etiquetas */
+    font-size: 1rem; /* Ajusta el tamaño de la fuente si es necesario */
+  }
+
+  .titulo-pagos {
+    font-family: 'Poppins', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    transition: color 0.4s, transform 0.4s ease;
+  }
+  
+  .titulo-pagos:hover {
+    color: #28a745;
+    transform: rotate(3deg);
+  }
+  
+  form button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    grid-column: span 2;
+    margin-top: 20px;
+  }
+  
+  form button:hover {
+    background-color: #0056b3;
+  }
+  
+  input[type="number"] {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    text-align: right;
+  }
+  
+  select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+  }
+  
+  select:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+    outline: none;
+  }
+  
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  label {
+    font-size: 18px;
+    color: #333;
+  }
+  
+  form input, form select {
+    padding: 8px; /* Ajusta el padding de los inputs */
+    font-size: 1rem; /* Ajusta el tamaño de la fuente de los inputs */
+    margin: 5px 0; /* Reduces el margen entre los inputs y las etiquetas */
+  }
+
+  form .input-group input, form .input-group select {
+    width: 100%;
+    box-sizing: border-box; /* Para evitar que el padding afecte el tamaño */
+  }
