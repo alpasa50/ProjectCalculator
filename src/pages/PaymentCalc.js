@@ -682,16 +682,16 @@ const handleCalculateTargetFee = () => {
       });
     } else {
       // Save as new project (always creates new, never overwrites)
-      const newProject = projectManager.saveProject(projectData);
-      setCurrentProjectId(newProject.id);
+      projectManager.saveProject(projectData);
       
-      // Clear form for next project
+      // Clear form for next project - and reset currentProjectId for new projects
       setProjectName('');
       setTotalCost('');
       setReserve('');
       setSigningPercentage('');
       setBuildingPercentage('');
       setMonthsToPay('');
+      setCurrentProjectId(null);
       
       Swal.fire({
         title: 'Proyecto guardado',
@@ -1098,7 +1098,15 @@ const handleCalculateTargetFee = () => {
             type="number" 
             id="target-fee" 
             value={targetMonthlyFee}
-            onChange={(e) => setTargetMonthlyFee(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Solo aceptar números enteros para la cuota objetivo
+              if (value === '' || /^\d+$/.test(value)) {
+                setTargetMonthlyFee(value);
+              }
+            }}
+            step="1"
+            inputMode="numeric"
             placeholder={`ej: ${buildingAmount / monthsToPay || 'monto'}`}
           />
           <button
@@ -1215,7 +1223,7 @@ const handleCalculateTargetFee = () => {
     </>
   </>
 )}
-          <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
       <button type="submit" style={{
         padding: '12px 24px',
         backgroundColor: '#10b981',
@@ -1242,6 +1250,33 @@ const handleCalculateTargetFee = () => {
       }}>
         💾 Guardar Proyecto
       </button>
+      {currentProjectId && (
+        <button type="button" onClick={() => {
+          setProjectName('');
+          setTotalCost('');
+          setReserve('');
+          setSigningPercentage('');
+          setBuildingPercentage('');
+          setMonthsToPay('');
+          setPaymentDay(1);
+          setTargetMonthlyFee('');
+          setPagosExtraordinarios(false);
+          setSelectedDates([]);
+          setCurrentProjectId(null);
+        }} style={{
+          padding: '12px 24px',
+          backgroundColor: '#ef4444',
+          color: 'white',
+          fontWeight: 'bold',
+          borderRadius: '10px',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
+        }}>
+          ➕ Nuevo Proyecto
+        </button>
+      )}
     </div>
   </form>
         <br/>
