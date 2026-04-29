@@ -394,6 +394,7 @@ form button:active {
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .project-card {
   background-color: white;
