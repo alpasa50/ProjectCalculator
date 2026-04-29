@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { jacquelineProjectManager } from '../utils/jacquelineProjectManager';
 import Swal from 'sweetalert2';
 import '../utils/PaymentCalc.css'; // Reuse CSS for styling
@@ -21,15 +21,34 @@ function JacquelinePage({ isEditMode = false }) {
     name: ''
   });
 
+  const loadSections = useCallback(() => {
+    const allSections = jacquelineProjectManager.getAllSections();
+    setSections(allSections);
+  }, []);
+
+  const loadProjects = useCallback(() => {
+    const allProjects = jacquelineProjectManager.getAllProjects();
+    const normalizedProjects = allProjects.map((p) => {
+      const project = {
+        ...p,
+        section: p.section || 'default'
+      };
+      const status = getProjectStatus(project);
+      if (status !== project.status) {
+        jacquelineProjectManager.updateProject(project.id, { ...project, status });
+      }
+      return {
+        ...project,
+        status
+      };
+    });
+    setProjects(normalizedProjects.reverse()); // Newest first
+  }, [getProjectStatus]);
+
   useEffect(() => {
     loadProjects();
     loadSections();
-  }, []);
-
-  const loadSections = () => {
-    const allSections = jacquelineProjectManager.getAllSections();
-    setSections(allSections);
-  };
+  }, [loadProjects, loadSections]);
 
   const isPastDue = (deliveryDate) => {
     if (!deliveryDate) return false;
@@ -51,25 +70,6 @@ function JacquelinePage({ isEditMode = false }) {
       return project.status === 'ready' ? 'ready' : 'pending';
     }
     return isPastDue(project.deliveryDate) ? 'ready' : 'pending';
-  };
-
-  const loadProjects = () => {
-    const allProjects = jacquelineProjectManager.getAllProjects();
-    const normalizedProjects = allProjects.map((p) => {
-      const project = {
-        ...p,
-        section: p.section || 'default'
-      };
-      const status = getProjectStatus(project);
-      if (status !== project.status) {
-        jacquelineProjectManager.updateProject(project.id, { ...project, status });
-      }
-      return {
-        ...project,
-        status
-      };
-    });
-    setProjects(normalizedProjects.reverse()); // Newest first
   };
 
   const handleAddProject = () => {
