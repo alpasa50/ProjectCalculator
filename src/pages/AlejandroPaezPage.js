@@ -26,19 +26,50 @@ function AlejandroPaezPage({ isEditMode = false }) {
     loadSections();
   }, []);
 
-  const loadProjects = () => {
-    const allProjects = alejandroProjectManager.getAllProjects();
-    // Ensure all projects have a section
-    const updatedProjects = allProjects.map(p => ({
-      ...p,
-      section: p.section || 'default'
-    }));
-    setProjects(updatedProjects.reverse()); // Newest first
-  };
-
   const loadSections = () => {
     const allSections = alejandroProjectManager.getAllSections();
     setSections(allSections);
+  };
+
+  const isPastDue = (deliveryDate) => {
+    if (!deliveryDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(deliveryDate);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  };
+
+  const formatDateToDDMMYYYY = (deliveryDate) => {
+    if (!deliveryDate) return '';
+    const [year, month, day] = deliveryDate.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const getProjectStatus = (project) => {
+    if (!project.deliveryDate) {
+      return project.status === 'ready' ? 'ready' : 'pending';
+    }
+    return isPastDue(project.deliveryDate) ? 'ready' : 'pending';
+  };
+
+  const loadProjects = () => {
+    const allProjects = alejandroProjectManager.getAllProjects();
+    const normalizedProjects = allProjects.map((p) => {
+      const project = {
+        ...p,
+        section: p.section || 'default'
+      };
+      const status = getProjectStatus(project);
+      if (status !== project.status) {
+        alejandroProjectManager.updateProject(project.id, { ...project, status });
+      }
+      return {
+        ...project,
+        status
+      };
+    });
+    setProjects(normalizedProjects.reverse()); // Newest first
   };
 
   const handleAddProject = () => {
@@ -139,11 +170,16 @@ function AlejandroPaezPage({ isEditMode = false }) {
       return;
     }
 
+    const projectData = {
+      ...formData,
+      status: isPastDue(formData.deliveryDate) ? 'ready' : formData.status
+    };
+
     if (editingProject) {
-      alejandroProjectManager.updateProject(editingProject.id, formData);
+      alejandroProjectManager.updateProject(editingProject.id, projectData);
       Swal.fire('Actualizado', 'El proyecto ha sido actualizado.', 'success');
     } else {
-      alejandroProjectManager.saveProject(formData);
+      alejandroProjectManager.saveProject(projectData);
       Swal.fire('Guardado', 'El proyecto ha sido guardado.', 'success');
     }
     setShowModal(false);
@@ -186,8 +222,8 @@ function AlejandroPaezPage({ isEditMode = false }) {
                 {sectionProjects.map(project => (
                   <div key={project.id} className="project-card" onClick={() => handleLinkClick(project)} style={{ cursor: 'pointer' }}>
                     <h3>{project.name}</h3>
-                    <p>Fecha de entrega: {project.deliveryDate || 'Sin fecha'}</p>
-                    <p>Estado: {project.status === 'ready' ? 'Listo' : 'Pendiente'}</p>
+                    <p>Fecha de entrega: {formatDateToDDMMYYYY(project.deliveryDate) || 'Sin fecha'}</p>
+                    <p>Estado: {getProjectStatus(project) === 'ready' ? 'Listo' : 'Pendiente'}</p>
                     {isEditMode && (
                       <div className="card-buttons" onClick={(e) => e.stopPropagation()}>
                         <button className="btn btn-warning" onClick={() => handleEditProject(project)}>Editar</button>
