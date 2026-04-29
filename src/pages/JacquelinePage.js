@@ -158,9 +158,6 @@ function JacquelinePage({ isEditMode = false }) {
     }
   };
 
-  const pendingProjects = projects.filter(p => p.status === 'pending');
-  const readyProjects = projects.filter(p => p.status === 'ready');
-
   return (
     <div className="calculator-container jacqueline-page">
       <h1>Proyectos de Jacqueline Sanchez</h1>
