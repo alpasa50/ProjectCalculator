@@ -21,6 +21,29 @@ function AlejandroPaezPage({ isEditMode = false }) {
     name: ''
   });
 
+  // Helper functions (must be defined before useCallback hooks)
+  const isPastDue = (deliveryDate) => {
+    if (!deliveryDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(deliveryDate);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  };
+
+  const formatDateToDDMMYYYY = (deliveryDate) => {
+    if (!deliveryDate) return '';
+    const [year, month, day] = deliveryDate.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
+  const getProjectStatus = useCallback((project) => {
+    if (!project.deliveryDate) {
+      return project.status === 'ready' ? 'ready' : 'pending';
+    }
+    return isPastDue(project.deliveryDate) ? 'ready' : 'pending';
+  }, []);
+
   const loadSections = useCallback(() => {
     const allSections = alejandroProjectManager.getAllSections();
     setSections(allSections);
@@ -49,28 +72,6 @@ function AlejandroPaezPage({ isEditMode = false }) {
     loadProjects();
     loadSections();
   }, [loadProjects, loadSections]);
-
-  const isPastDue = (deliveryDate) => {
-    if (!deliveryDate) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(deliveryDate);
-    dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today;
-  };
-
-  const formatDateToDDMMYYYY = (deliveryDate) => {
-    if (!deliveryDate) return '';
-    const [year, month, day] = deliveryDate.split('-');
-    return `${day}/${month}/${year}`;
-  };
-
-  const getProjectStatus = (project) => {
-    if (!project.deliveryDate) {
-      return project.status === 'ready' ? 'ready' : 'pending';
-    }
-    return isPastDue(project.deliveryDate) ? 'ready' : 'pending';
-  };
 
   const handleAddProject = () => {
     setEditingProject(null);
