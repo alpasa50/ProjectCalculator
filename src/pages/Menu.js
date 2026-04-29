@@ -92,6 +92,52 @@ function Menu() {
           >
             🧾 Simulador
           </Nav.Link>
+          <Nav.Link 
+            as={Link} 
+            to="/jacqueline" 
+            style={{
+              color: '#374151',
+              fontWeight: '600',
+              background: 'transparent',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontSize: 'clamp(0.8rem, 2vw, 0.95rem)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#f0fdf4';
+              e.target.style.color = '#10b981';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#374151';
+            }}
+          >
+            👩 Jacqueline Sanchez
+          </Nav.Link>
+          <Nav.Link 
+            as={Link} 
+            to="/alejandro" 
+            style={{
+              color: '#374151',
+              fontWeight: '600',
+              background: 'transparent',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              transition: 'all 0.3s ease',
+              fontSize: 'clamp(0.8rem, 2vw, 0.95rem)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#f0fdf4';
+              e.target.style.color = '#10b981';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#374151';
+            }}
+          >
+            👨 Alejandro Paez
+          </Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
