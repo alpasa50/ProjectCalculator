@@ -1,133 +1,227 @@
-// Jacqueline Project Manager Utility - handles saving, loading, and deleting Jacqueline's projects and sections
+import { supabase } from './supabaseClient';
 
-const STORAGE_KEY_PROJECTS = 'jacquelineProjects';
-const STORAGE_KEY_SECTIONS = 'jacquelineSections';
+const normalizeProjectSection = (section) => {
+  if (!section || section === 'General') return 'default';
+  return section;
+};
+
+const mapProjectFromDb = (row) => ({
+  ...row,
+  deliveryDate: row.deliverydate || null,
+  section: normalizeProjectSection(row.section)
+});
+
+const mapProjectToDb = (project) => ({
+  id: project.id || Date.now().toString(),
+  name: project.name,
+  deliverydate: project.deliveryDate || null,
+  status: project.status,
+  link: project.link,
+  section: normalizeProjectSection(project.section)
+});
 
 export const jacquelineProjectManager = {
-  // Get all saved projects
-  getAllProjects: () => {
-    const projects = localStorage.getItem(STORAGE_KEY_PROJECTS);
-    return projects ? JSON.parse(projects) : [];
-  },
+  // Get all projects
+  getAllProjects: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jacqueline_projects')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  // Save a new project
-  saveProject: (projectData) => {
-    const projects = jacquelineProjectManager.getAllProjects();
-    const newProject = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      section: 'default', // default section
-      ...projectData
-    };
-    projects.push(newProject);
-    localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-    return newProject;
-  },
-
-  // Load a specific project
-  loadProject: (projectId) => {
-    const projects = jacquelineProjectManager.getAllProjects();
-    return projects.find(p => p.id === projectId);
-  },
-
-  // Update an existing project
-  updateProject: (projectId, projectData) => {
-    const projects = jacquelineProjectManager.getAllProjects();
-    const index = projects.findIndex(p => p.id === projectId);
-    if (index !== -1) {
-      projects[index] = {
-        ...projects[index],
-        ...projectData,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
-      return projects[index];
+      if (error) throw error;
+      return (data || []).map(mapProjectFromDb);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      return [];
     }
-    return null;
   },
 
-  // Delete a project
-  deleteProject: (projectId) => {
-    const projects = jacquelineProjectManager.getAllProjects();
-    const filtered = projects.filter(p => p.id !== projectId);
-    localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(filtered));
+  // Save new project
+  saveProject: async (project) => {
+    try {
+      const newProject = mapProjectToDb({
+        ...project,
+        status: project.status || 'pending',
+        section: project.section || 'default'
+      });
+
+      const { data, error } = await supabase
+        .from('jacqueline_projects')
+        .insert([newProject])
+        .select();
+
+      if (error) throw error;
+      return mapProjectFromDb(data?.[0] || newProject);
+    } catch (error) {
+      console.error('Error saving project:', error);
+      throw error;
+    }
+  },
+
+  // Update project
+  updateProject: async (projectId, updates) => {
+    try {
+      const dbUpdates = mapProjectToDb({ ...updates, id: projectId });
+      const { data, error } = await supabase
+        .from('jacqueline_projects')
+        .update(dbUpdates)
+        .eq('id', projectId)
+        .select();
+
+      if (error) throw error;
+      return mapProjectFromDb(data?.[0] || updates);
+    } catch (error) {
+      console.error('Error updating project:', error);
+      return updates;
+    }
+  },
+
+  // Delete project
+  deleteProject: async (projectId) => {
+    try {
+      const { error } = await supabase
+        .from('jacqueline_projects')
+        .delete()
+        .eq('id', projectId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      return false;
+    }
   },
 
   // Get all sections
-  getAllSections: () => {
-    const sections = localStorage.getItem(STORAGE_KEY_SECTIONS);
-    if (sections) {
-      return JSON.parse(sections);
-    }
-    // Default sections
-    const defaultSections = [
-      { id: 'default', name: 'General' },
-      { id: 'pending', name: 'Pendientes' },
-      { id: 'ready', name: 'Listos' }
-    ];
-    localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(defaultSections));
-    return defaultSections;
-  },
+  getAllSections: async () => {
+    try {
+      const { data, error } = await supabase
+        .from('jacqueline_sections')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-  // Save a new section
-  saveSection: (sectionData) => {
-    const sections = jacquelineProjectManager.getAllSections();
-    const newSection = {
-      id: Date.now().toString(),
-      ...sectionData
-    };
-    sections.push(newSection);
-    localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(sections));
-    return newSection;
-  },
-
-  // Update a section
-  updateSection: (sectionId, sectionData) => {
-    const sections = jacquelineProjectManager.getAllSections();
-    const index = sections.findIndex(s => s.id === sectionId);
-    if (index !== -1) {
-      sections[index] = {
-        ...sections[index],
-        ...sectionData
-      };
-      localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(sections));
-      return sections[index];
-    }
-    return null;
-  },
-
-  // Delete a section
-  deleteSection: (sectionId) => {
-    const sections = jacquelineProjectManager.getAllSections();
-    const filtered = sections.filter(s => s.id !== sectionId);
-    localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(filtered));
-    // Move projects in this section to default
-    const projects = jacquelineProjectManager.getAllProjects();
-    projects.forEach(p => {
-      if (p.section === sectionId) {
-        p.section = 'default';
+      if (error) throw error;
+      
+      // If no sections exist, create default ones
+      if (!data || data.length === 0) {
+        const defaultSections = [
+          { id: 'default', name: 'General' },
+          { id: 'pending', name: 'Pendientes' },
+          { id: 'ready', name: 'Listos' }
+        ];
+        
+        for (const section of defaultSections) {
+          await supabase.from('jacqueline_sections').insert([section]).select();
+        }
+        
+        return defaultSections;
       }
-    });
-    localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+      return [];
+    }
   },
 
-  // Export projects as JSON
-  exportProjects: () => {
-    const projects = jacquelineProjectManager.getAllProjects();
-    const dataStr = JSON.stringify(projects, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = `jacqueline_projects_backup_${new Date().toISOString().split('T')[0]}.json`;
+  // Save new section
+  saveSection: async (section) => {
+    try {
+      const newSection = {
+        id: Date.now().toString(),
+        name: section.name || ''
+      };
 
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+      const { data, error } = await supabase
+        .from('jacqueline_sections')
+        .insert([newSection])
+        .select();
+
+      if (error) throw error;
+      return data?.[0] || newSection;
+    } catch (error) {
+      console.error('Error saving section:', error);
+      return section;
+    }
   },
 
-  // Import projects from JSON
-  importProjects: (projects) => {
-    const existingProjects = jacquelineProjectManager.getAllProjects();
-    const mergedProjects = [...existingProjects, ...projects];
-    localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(mergedProjects));
+  // Update section
+  updateSection: async (sectionId, updates) => {
+    try {
+      const { data, error } = await supabase
+        .from('jacqueline_sections')
+        .update(updates)
+        .eq('id', sectionId)
+        .select();
+
+      if (error) throw error;
+      return data?.[0] || updates;
+    } catch (error) {
+      console.error('Error updating section:', error);
+      return updates;
+    }
+  },
+
+  // Delete section
+  deleteSection: async (sectionId) => {
+    try {
+      // Move projects in this section to default
+      await supabase
+        .from('jacqueline_projects')
+        .update({ section: 'default' })
+        .eq('section', sectionId);
+
+      // Delete the section
+      const { error } = await supabase
+        .from('jacqueline_sections')
+        .delete()
+        .eq('id', sectionId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error deleting section:', error);
+      return false;
+    }
+  },
+
+  // Subscribe to real-time updates
+  subscribeToProjectsChanges: (callback) => {
+    const subscription = supabase
+      .channel('jacqueline_projects_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'jacqueline_projects'
+        },
+        (payload) => {
+          callback(payload);
+        }
+      )
+      .subscribe();
+
+    return subscription;
+  },
+
+  subscribeToSectionsChanges: (callback) => {
+    const subscription = supabase
+      .channel('jacqueline_sections_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'jacqueline_sections'
+        },
+        (payload) => {
+          callback(payload);
+        }
+      )
+      .subscribe();
+
+    return subscription;
   }
 };

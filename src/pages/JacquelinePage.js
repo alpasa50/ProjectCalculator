@@ -22,55 +22,73 @@ function JacquelinePage({ isEditMode = false }) {
   });
 
   // Helper functions (must be defined before useCallback hooks)
-  const isPastDue = (deliveryDate) => {
-    if (!deliveryDate) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(deliveryDate);
-    dueDate.setHours(0, 0, 0, 0);
-    return dueDate < today;
-  };
-
   const formatDateToDDMMYYYY = (deliveryDate) => {
     if (!deliveryDate) return '';
     const [year, month, day] = deliveryDate.split('-');
     return `${day}/${month}/${year}`;
   };
 
+  const isPastDue = useCallback((deliveryDate) => {
+    if (!deliveryDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(deliveryDate);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
+  }, []);
+
   const getProjectStatus = useCallback((project) => {
     if (!project.deliveryDate) {
       return project.status === 'ready' ? 'ready' : 'pending';
     }
     return isPastDue(project.deliveryDate) ? 'ready' : 'pending';
-  }, []);
+  }, [isPastDue]);
 
-  const loadSections = useCallback(() => {
-    const allSections = jacquelineProjectManager.getAllSections();
+  const loadSections = useCallback(async () => {
+    const allSections = await jacquelineProjectManager.getAllSections();
     setSections(allSections);
   }, []);
 
-  const loadProjects = useCallback(() => {
-    const allProjects = jacquelineProjectManager.getAllProjects();
-    const normalizedProjects = allProjects.map((p) => {
+  const loadProjects = useCallback(async () => {
+    const allProjects = await jacquelineProjectManager.getAllProjects();
+    const normalizedProjects = await Promise.all(allProjects.map(async (p) => {
       const project = {
         ...p,
         section: p.section || 'default'
       };
       const status = getProjectStatus(project);
       if (status !== project.status) {
-        jacquelineProjectManager.updateProject(project.id, { ...project, status });
+        await jacquelineProjectManager.updateProject(project.id, { ...project, status });
       }
       return {
         ...project,
         status
       };
-    });
+    }));
     setProjects(normalizedProjects.reverse()); // Newest first
   }, [getProjectStatus]);
 
   useEffect(() => {
     loadProjects();
     loadSections();
+  }, [loadProjects, loadSections]);
+
+  useEffect(() => {
+    const projectSubscription = jacquelineProjectManager.subscribeToProjectsChanges(async () => {
+      await loadProjects();
+    });
+    const sectionSubscription = jacquelineProjectManager.subscribeToSectionsChanges(async () => {
+      await loadSections();
+    });
+
+    return () => {
+      if (projectSubscription?.unsubscribe) {
+        projectSubscription.unsubscribe();
+      }
+      if (sectionSubscription?.unsubscribe) {
+        sectionSubscription.unsubscribe();
+      }
+    };
   }, [loadProjects, loadSections]);
 
   const handleAddProject = () => {
@@ -97,8 +115,8 @@ function JacquelinePage({ isEditMode = false }) {
     setShowModal(true);
   };
 
-  const handleDeleteProject = (projectId, projectName) => {
-    Swal.fire({
+  const handleDeleteProject = async (projectId, projectName) => {
+    const result = await Swal.fire({
       title: '¿Eliminar proyecto?',
       text: `¿Estás seguro de que deseas eliminar "${projectName}"?`,
       icon: 'warning',
@@ -107,13 +125,13 @@ function JacquelinePage({ isEditMode = false }) {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        jacquelineProjectManager.deleteProject(projectId);
-        loadProjects();
-        Swal.fire('Eliminado', 'El proyecto ha sido eliminado.', 'success');
-      }
     });
+
+    if (result.isConfirmed) {
+      await jacquelineProjectManager.deleteProject(projectId);
+      await loadProjects();
+      Swal.fire('Eliminado', 'El proyecto ha sido eliminado.', 'success');
+    }
   };
 
   const handleAddSection = () => {
@@ -128,8 +146,8 @@ function JacquelinePage({ isEditMode = false }) {
     setShowSectionModal(true);
   };
 
-  const handleDeleteSection = (sectionId, sectionName) => {
-    Swal.fire({
+  const handleDeleteSection = async (sectionId, sectionName) => {
+    const result = await Swal.fire({
       title: '¿Eliminar sección?',
       text: `¿Estás seguro de que deseas eliminar "${sectionName}"? Los proyectos se moverán a "General".`,
       icon: 'warning',
@@ -138,34 +156,34 @@ function JacquelinePage({ isEditMode = false }) {
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        jacquelineProjectManager.deleteSection(sectionId);
-        loadSections();
-        loadProjects();
-        Swal.fire('Eliminado', 'La sección ha sido eliminada.', 'success');
-      }
     });
+
+    if (result.isConfirmed) {
+      await jacquelineProjectManager.deleteSection(sectionId);
+      await loadSections();
+      await loadProjects();
+      Swal.fire('Eliminado', 'La sección ha sido eliminada.', 'success');
+    }
   };
 
-  const handleSaveSection = () => {
+  const handleSaveSection = async () => {
     if (!sectionFormData.name.trim()) {
       Swal.fire('Error', 'El nombre de la sección es obligatorio.', 'error');
       return;
     }
 
     if (editingSection) {
-      jacquelineProjectManager.updateSection(editingSection.id, sectionFormData);
+      await jacquelineProjectManager.updateSection(editingSection.id, sectionFormData);
       Swal.fire('Actualizado', 'La sección ha sido actualizada.', 'success');
     } else {
-      jacquelineProjectManager.saveSection(sectionFormData);
+      await jacquelineProjectManager.saveSection(sectionFormData);
       Swal.fire('Guardado', 'La sección ha sido guardada.', 'success');
     }
     setShowSectionModal(false);
-    loadSections();
+    await loadSections();
   };
 
-  const handleSaveProject = () => {
+  const handleSaveProject = async () => {
     if (!formData.name.trim()) {
       Swal.fire('Error', 'El nombre del proyecto es obligatorio.', 'error');
       return;
@@ -173,18 +191,24 @@ function JacquelinePage({ isEditMode = false }) {
 
     const projectData = {
       ...formData,
-      status: isPastDue(formData.deliveryDate) ? 'ready' : formData.status
+      status: isPastDue(formData.deliveryDate) ? 'ready' : formData.status,
+      section: formData.section || 'default'
     };
 
-    if (editingProject) {
-      jacquelineProjectManager.updateProject(editingProject.id, projectData);
-      Swal.fire('Actualizado', 'El proyecto ha sido actualizado.', 'success');
-    } else {
-      jacquelineProjectManager.saveProject(projectData);
-      Swal.fire('Guardado', 'El proyecto ha sido guardado.', 'success');
+    try {
+      if (editingProject) {
+        await jacquelineProjectManager.updateProject(editingProject.id, projectData);
+        Swal.fire('Actualizado', 'El proyecto ha sido actualizado.', 'success');
+      } else {
+        await jacquelineProjectManager.saveProject(projectData);
+        Swal.fire('Guardado', 'El proyecto ha sido guardado.', 'success');
+      }
+      setShowModal(false);
+      await loadProjects();
+    } catch (error) {
+      console.error('Error saving project:', error);
+      Swal.fire('Error', 'No se pudo guardar el proyecto. Revisa la consola.', 'error');
     }
-    setShowModal(false);
-    loadProjects();
   };
 
   const handleLinkClick = (project) => {

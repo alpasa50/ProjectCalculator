@@ -598,6 +598,41 @@ form button:active {
   }
 }
 
+.login-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.login-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.16);
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h2 {
+  margin-bottom: 16px;
+  font-size: 1.8rem;
+}
+
+.login-card p {
+  margin-bottom: 24px;
+  color: #4b5563;
+}
+
+.login-card .form-group {
+  margin-bottom: 18px;
+}
+
+.login-card button {
+  width: 100%;
+}
+
 @media (max-width: 480px) {
   /* Extra small screens */
   .toggle-group {
