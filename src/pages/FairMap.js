@@ -925,7 +925,9 @@ export default function RealEstateMapPage() {
     let isMounted = true;
 
     const initMap = async () => {
+      // eslint-disable-next-line import/no-webpack-loader-syntax
       const mb = await import("mapbox-gl");
+      
       await import("mapbox-gl/dist/mapbox-gl.css");
       const mapboxgl = mb.default;
       mapboxglRef.current = mapboxgl;
