@@ -767,7 +767,7 @@ export default function RealEstateMapPage() {
   const [drawerExpanded, setDrawerExpanded] = useState(false);
   const [hiddenIds,      setHiddenIds]      = useState([]);
   const [showSettings,   setShowSettings]   = useState(false);
-  const [activePOI,      setActivePOI]      = useState(null);
+  const [activePOI]      = useState(null);
   const [containerSize,  setContainerSize]  = useState({ w: 0, h: 0 });
 
   // Sincronizar ref con estado (para callbacks que no se recrean)
