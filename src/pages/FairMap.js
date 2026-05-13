@@ -317,6 +317,16 @@ const properties = [
     url: "https://drive.google.com/drive/folders/1fV6UPNjaJlF6QW1NiOXGucHNYcf29Zn9?usp=drive_link",
     promo: { label: "⚡ MIDTOWN MIDTOWN", detail: "Reserva con solo US$1000" },
   },
+  {
+    id: 29, zone: "sde",
+    title: "Brisas de las Colinas 7",
+    price: "US$61,000", monthlyFee: "US$400/mes",
+    deliveryDate: "Junio 2028", beds: "3 hab", baths: 1, sqft: "62 m²",
+    image: "https://lh3.google.com/u/0/d/1BHymtILrqIDY1ekAPpFN4rOFj2Sq2p9w=w1919-h944-iv1?auditContext=prefetch",
+    coordinates: [-69.789789, 18.537075], status: "En preventa",
+    url: "https://drive.google.com/drive/folders/1zZMzljNNCii0u8kscZPpiMWlMpcPnPVc?usp=drive_link",
+    promo: { label: "⚡ Feria", detail: "Reserva con solo US$250" },
+  },
 ];
 
 const STATUS_COLORS = {
