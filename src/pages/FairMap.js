@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import mapboxgl from "mapbox-gl/dist/mapbox-gl-csp";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const DEFAULT_CENTER = [-69.9312, 18.65];
 const DEFAULT_ZOOM   = 7.5;
@@ -918,52 +920,75 @@ export default function RealEstateMapPage() {
   }, [loadPOI]); */
 
   // ── Init mapa
+ 
+
   useEffect(() => {
-     
-    let isMounted = true;
-    const initMap = async () => {
-      const mb = await import("mapbox-gl");
-      await import("mapbox-gl/dist/mapbox-gl.css");
-      const mapboxgl = mb.default;
-      mapboxgl.accessToken =
-      process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-      mapboxglRef.current = mapboxgl;
-      if (!isMounted || !mapContainer.current) return;
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: MAP_STYLES[0].url,
-        center: DEFAULT_CENTER,
-        zoom: DEFAULT_ZOOM,
-        attributionControl: false,
-      });
+  let isMounted = true;
 
-      map.current.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "bottom-right");
-      map.current.addControl(new mapboxgl.AttributionControl({ compact: true }), "bottom-left");
+  mapboxgl.accessToken =
+    process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-      map.current.on("load", () => {
-        if (!isMounted) return;
-        addMarkers(mapboxgl);
-        setMapReady(true);
-      });
+  mapboxgl.workerUrl = "/mapbox-gl-csp-worker.js";
 
-      map.current.on("move", () => {
-        setSelectedProp((prev) => { if (prev) updatePinPos(prev); return prev; });
-      });
+  mapboxglRef.current = mapboxgl;
 
-      map.current.on("click", () => setSelectedProp(null));
-    };
+  if (!mapContainer.current) return;
 
-    initMap();
+  map.current = new mapboxgl.Map({
+    container: mapContainer.current,
+    style: MAP_STYLES[0].url,
+    center: DEFAULT_CENTER,
+    zoom: DEFAULT_ZOOM,
+    attributionControl: false,
+  });
 
-    return () => {
-      isMounted = false;
-      markersRef.current.forEach((m) => m.remove());
-      poiMarkersRef.current.forEach((m) => m.remove());
-      markersRef.current = [];
-      poiMarkersRef.current = [];
-      if (map.current) { map.current.remove(); map.current = null; }
-    };
-  }, [addMarkers, updatePinPos]);
+  map.current.addControl(
+    new mapboxgl.NavigationControl({
+      showCompass: false,
+    }),
+    "bottom-right"
+  );
+
+  map.current.addControl(
+    new mapboxgl.AttributionControl({
+      compact: true,
+    }),
+    "bottom-left"
+  );
+
+  map.current.on("load", () => {
+    if (!isMounted) return;
+
+    addMarkers(mapboxgl);
+    setMapReady(true);
+  });
+
+  map.current.on("move", () => {
+    setSelectedProp((prev) => {
+      if (prev) updatePinPos(prev);
+      return prev;
+    });
+  });
+
+  map.current.on("click", () => {
+    setSelectedProp(null);
+  });
+
+  return () => {
+    isMounted = false;
+
+    markersRef.current.forEach((m) => m.remove());
+    poiMarkersRef.current.forEach((m) => m.remove());
+
+    markersRef.current = [];
+    poiMarkersRef.current = [];
+
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
+  };
+}, [addMarkers, updatePinPos]);
 
   // FIX: re-render marcadores cuando cambia hiddenIds — sin loop infinito
   useEffect(() => {
