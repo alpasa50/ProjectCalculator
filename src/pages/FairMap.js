@@ -2,9 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-
-
-
 const DEFAULT_CENTER = [-69.9312, 18.65];
 const DEFAULT_ZOOM   = 7.5;
 
@@ -922,18 +919,16 @@ export default function RealEstateMapPage() {
 
   // ── Init mapa
   useEffect(() => {
+     
     let isMounted = true;
-
     const initMap = async () => {
-      // eslint-disable-next-line import/no-webpack-loader-syntax
       const mb = await import("mapbox-gl");
-      
       await import("mapbox-gl/dist/mapbox-gl.css");
       const mapboxgl = mb.default;
+      mapboxgl.accessToken =
+      process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
       mapboxglRef.current = mapboxgl;
-      mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
       if (!isMounted || !mapContainer.current) return;
-
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: MAP_STYLES[0].url,
