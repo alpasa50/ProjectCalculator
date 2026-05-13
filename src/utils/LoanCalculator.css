@@ -1,0 +1,437 @@
+.loan-container {
+
+  max-width: 1400px;
+
+  margin: 0 auto;
+
+  padding: 30px;
+
+  font-family: 'Poppins', sans-serif;
+
+}
+
+.loan-card {
+
+  background: white;
+
+  border-radius: 16px;
+
+  padding: 30px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.08);
+
+}
+
+.loan-title {
+
+  font-size: 2.5rem;
+
+  font-weight: 700;
+
+  color: #1f2937;
+
+  text-align: center;
+
+  margin-bottom: 10px;
+
+  transition: all 0.3s ease;
+
+}
+
+.loan-title:hover {
+
+  color: #10b981;
+
+  text-shadow:
+    0 4px 12px rgba(16,185,129,0.2);
+
+}
+
+.loan-note {
+
+  text-align: center;
+
+  color: #6b7280;
+
+  margin-bottom: 30px;
+
+}
+
+/* ========================================
+FORM
+======================================== */
+
+.loan-form {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(250px, 1fr));
+
+  gap: 20px;
+
+  margin-bottom: 30px;
+
+}
+
+.loan-form input {
+
+  width: 100%;
+
+  padding: 12px;
+
+  font-size: 15px;
+
+  border: 2px solid #e5e7eb;
+
+  border-radius: 8px;
+
+  transition: all 0.3s ease;
+
+  background-color: white;
+
+  box-sizing: border-box;
+
+}
+
+.loan-form input:focus {
+
+  border-color: #10b981;
+
+  box-shadow:
+    0 0 0 3px rgba(16,185,129,0.1);
+
+  outline: none;
+
+}
+
+.loan-form input[type="number"] {
+
+  appearance: textfield;
+
+  text-align: right;
+
+}
+
+.loan-form button {
+
+  background-color: #10b981;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 14px;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.3s,
+    transform 0.2s;
+
+  font-weight: 600;
+
+}
+
+.loan-form button:hover {
+
+  background-color: #059669;
+
+  transform: translateY(-2px);
+
+}
+
+.loan-form button:active {
+
+  transform: translateY(0);
+
+}
+
+/* ========================================
+RESULTADO
+======================================== */
+
+.resultado-box {
+
+  background-color: #f9fafb;
+
+  border-radius: 12px;
+
+  padding: 30px;
+
+  margin-bottom: 30px;
+
+  border-left: 5px solid #10b981;
+
+}
+
+.resultado-box h2 {
+
+  margin-top: 0;
+
+  color: #1f2937;
+
+}
+
+.resultado-cuota {
+
+  font-size: 3rem;
+
+  font-weight: 700;
+
+  color: #10b981;
+
+  margin: 20px 0;
+
+}
+
+.resultado-text {
+
+  color: #4b5563;
+
+  line-height: 1.6;
+
+  font-size: 1rem;
+
+}
+
+/* ========================================
+TABLA
+======================================== */
+
+.tabla-container {
+
+  margin-top: 30px;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  border: 1px solid #e5e7eb;
+
+  max-height: 700px;
+
+  overflow-y: auto;
+
+}
+
+.tabla-title {
+
+  font-size: 1.5rem;
+
+  font-weight: 600;
+
+  color: #1f2937;
+
+  margin-bottom: 15px;
+
+}
+
+/* ========================================
+TABLE
+======================================== */
+
+table {
+
+  border-collapse: collapse;
+
+  width: 100%;
+
+}
+
+td,
+th {
+
+  border: 1px solid #e5e7eb;
+
+  padding: 12px;
+
+  text-align: left;
+
+}
+
+th {
+
+  background-color: #10b981;
+
+  color: white;
+
+  font-weight: 600;
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 10;
+
+}
+
+tr:nth-child(even) {
+
+  background-color: #f9fafb;
+
+}
+
+tbody tr:hover {
+
+  background-color: #ecfdf5;
+
+  transition: background-color 0.2s ease;
+
+}
+
+/* ========================================
+SCROLL
+======================================== */
+
+.tabla-container::-webkit-scrollbar {
+
+  width: 10px;
+
+}
+
+.tabla-container::-webkit-scrollbar-thumb {
+
+  background: #10b981;
+
+  border-radius: 20px;
+
+}
+
+.tabla-container::-webkit-scrollbar-track {
+
+  background: #f3f4f6;
+
+}
+
+/* ========================================
+SECTION DIVIDER
+======================================== */
+
+.section-divider {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 30px 0 20px;
+
+  font-size: 1.2rem;
+
+  font-weight: 600;
+
+  color: #1f2937;
+
+}
+
+.section-divider::before,
+.section-divider::after {
+
+  content: '';
+
+  flex: 1;
+
+  height: 2px;
+
+  background:
+    linear-gradient(
+      to right,
+      #10b981,
+      transparent
+    );
+
+}
+
+.section-divider::after {
+
+  background:
+    linear-gradient(
+      to left,
+      #10b981,
+      transparent
+    );
+
+}
+
+/* ========================================
+RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+
+  .loan-container {
+
+    padding: 15px;
+
+  }
+
+  .loan-card {
+
+    padding: 20px;
+
+  }
+
+  .loan-title {
+
+    font-size: 2rem;
+
+  }
+
+  .resultado-cuota {
+
+    font-size: 2rem;
+
+  }
+
+  .loan-form {
+
+    grid-template-columns: 1fr;
+
+  }
+
+  table {
+
+    font-size: 0.85rem;
+
+  }
+
+  td,
+  th {
+
+    padding: 8px;
+
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .loan-title {
+
+    font-size: 1.6rem;
+
+  }
+
+  .resultado-cuota {
+
+    font-size: 1.7rem;
+
+  }
+
+  td,
+  th {
+
+    padding: 6px;
+
+    font-size: 0.75rem;
+
+  }
+
+}

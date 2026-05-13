@@ -1,13 +1,16 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import DateCalc from './pages/DateCalc';
+import FairMap from './pages/FairMap';
 import PaymentCalc from './pages/PaymentCalc';
 import RentalSimulator from './pages/RentalSimulator';
 import JacquelinePage from './pages/JacquelinePage';
 import AlejandroPaezPage from './pages/AlejandroPaezPage';
+import LoanCalculator  from './pages/LoanCalculator';
 import LoginPage from './pages/LoginPage';
 import Menu from './pages/Menu';
 import { isAuthenticated } from './utils/auth';
+
 
 function RequireAuth({ children }) {
   const location = useLocation();
@@ -24,8 +27,11 @@ function App() {
       <Routes>
         <Route exact path="/" element={<PaymentCalc />} />
         <Route path="/DateCalc" element={<DateCalc />} />
+        <Route path="/FeriaBR" element={<FairMap />} />
         <Route path="/Simulator" element={<RentalSimulator />} />
         <Route path="/jacqueline" element={<JacquelinePage />} />
+        <Route path="/loan-calculator" element={<LoanCalculator />} />
+        
         <Route
           path="/jacqueline/edit"
           element={

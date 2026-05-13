@@ -21,7 +21,7 @@ function PaymentCalc() {
   const [currentProjectId, setCurrentProjectId] = useState(null);
   const [showDatesSection, setShowDatesSection] = useState(true);
   const [showPaymentDays, setShowPaymentDays] = useState(true);
-  const [paymentStartMonth, setPaymentStartMonth] = useState(12); // December by default
+  const [paymentStartMonth, setPaymentStartMonth] = useState(6); // Jun by default
   const [targetMonthlyFee, setTargetMonthlyFee] = useState('');
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showPresetsModal, setShowPresetsModal] = useState(false);
