@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const MAPBOX_TOKEN = process.env.VITE_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const DEFAULT_CENTER = [-69.9312, 18.65];
 const DEFAULT_ZOOM   = 7.5;
