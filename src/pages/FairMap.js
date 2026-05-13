@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+
+
 
 const DEFAULT_CENTER = [-69.9312, 18.65];
 const DEFAULT_ZOOM   = 7.5;
@@ -872,7 +873,7 @@ export default function RealEstateMapPage() {
     // bbox de República Dominicana: aprox -72.0, 17.4, -68.2, 20.0
     const rdBbox = "-72.0,17.4,-68.2,20.0";
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(cat.query)}.json?` +
-      `country=do&bbox=${rdBbox}&limit=25&language=es&access_token=${MAPBOX_TOKEN}`;
+      `country=do&bbox=${rdBbox}&limit=25&language=es&access_token=${mapboxgl.accessToken}`;
 
     try {
       const res  = await fetch(url);
@@ -928,9 +929,9 @@ export default function RealEstateMapPage() {
       await import("mapbox-gl/dist/mapbox-gl.css");
       const mapboxgl = mb.default;
       mapboxglRef.current = mapboxgl;
+      mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
       if (!isMounted || !mapContainer.current) return;
 
-      mapboxgl.accessToken = MAPBOX_TOKEN;
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: MAP_STYLES[0].url,
